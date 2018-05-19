@@ -47,6 +47,9 @@ namespace IISSetup.Code
                 {
                     pool.ManagedPipelineMode = ManagedPipelineMode.Integrated;
                 }
+                if(App.VirtualDirectories.Count > 0){
+                    AddVirtualDirectories();
+                }
                 AssignPrivileges();
                 manager.CommitChanges();
 
