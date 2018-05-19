@@ -13,6 +13,7 @@ namespace IISSetup.Code
     class IISManager
     {
         private Application App { get; set; }
+        public ServerManager manager = new ServerManager();
         public IISManager(Application app)
         {
             App = app;
@@ -20,7 +21,7 @@ namespace IISSetup.Code
         public bool CreateInstance()
         {
             //Modifies the ApplicationHost.Config for IIS
-            ServerManager manager = new ServerManager();
+            
             if (manager.Sites.Where(r => r.Name == App.ApplicationName).ToList().Count > 0)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -58,6 +59,20 @@ namespace IISSetup.Code
 
             return true;
         }
+        public void AddVirtualDirectories()
+        {
+
+
+            foreach (VirtualDirectory directory in App.VirtualDirectories)
+            {
+                if (!Directory.Exists(directory.Path))
+                {
+                    ErrorHandler.WriteError(new DirectoryNotFoundException($"The following path was not found: {directory.Path}, Please make sure that the directory exists..."));
+                    return;
+                }
+                manager.Sites[App.ApplicationName].Applications[App.ApplicationName].VirtualDirectories.Add(directory.VirtualName, directory.Path);
+            }
+        }
         /// <summary>
         /// Designates the proper privileges to the directory
         /// </summary>
@@ -68,6 +83,7 @@ namespace IISSetup.Code
                 AddDirectorySecurity(App.Path, WindowsIdentity.GetCurrent().User.ToString().Split('\\').First() + "\\IIS_IUSRS", FileSystemRights.FullControl, AccessControlType.Allow);
                 AddDirectorySecurity(App.Path, WindowsIdentity.GetCurrent().User.ToString(), FileSystemRights.FullControl, AccessControlType.Allow);
                 AddDirectorySecurity(App.Path, "US\\US_SVC_EA_WEB_USR", FileSystemRights.FullControl, AccessControlType.Allow);
+
             }catch(Exception ex)
             {
                 ErrorHandler.WriteError(ex);
@@ -93,5 +109,8 @@ namespace IISSetup.Code
             dInfo.SetAccessControl(dSecurity);
 
         }
+
+
+
     }
 }

@@ -22,5 +22,7 @@ namespace IISSetup.Code
         public string PipelineMode { get; set; }
         public string Path { get; set; }
         public int Port { get; set; }
+
+        public List<VirtualDirectory> VirtualDirectories { get; set; }
     }
 }
