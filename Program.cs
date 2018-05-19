@@ -1,5 +1,6 @@
-﻿using Company.Commandline;
-using IISSetup.Code;
+﻿using IISSetup.Code;
+using log4net;
+using log4net.Config;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -15,9 +16,11 @@ namespace IISSetup
 {
     class Program
     {
+        public static readonly ILog log = LogManager.GetLogger(typeof(Program));
         static void Main(string[] args)
         {
             string dir = Directory.GetCurrentDirectory();
+            BasicConfigurator.Configure();
             if (Assembly.GetExecutingAssembly().GetCustomAttributes(false).OfType<DebuggableAttribute>().Any(da => da.IsJITTrackingEnabled))
             {
                 //Returns the static path for debugging purposes.
@@ -43,9 +46,6 @@ namespace IISSetup
                 manager.CreateInstance();
 
             }
-
-
-
 
         }
     }
